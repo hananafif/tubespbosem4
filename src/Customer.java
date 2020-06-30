@@ -1,3 +1,13 @@
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,12 +19,18 @@
  * @author 18102238_Mohammad Adiyudha_IF06G
  */
 public class Customer extends javax.swing.JFrame {
-
+    DefaultTableModel model;
     /**
      * Creates new form Customer
      */
     public Customer() {
         initComponents();
+        String []judul = {"ID Customer","Nama","Alamat","No HP"};
+        model = new DefaultTableModel(judul,0);
+        jTable_datacustomer.setModel(model);
+        tampil_tb_customer();
+        jButton_ubah.setEnabled(false);
+        jButton_hapus.setEnabled(false);
     }
 
     /**
@@ -77,21 +93,26 @@ public class Customer extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable4 = new javax.swing.JTable();
+        jTable_datacustomer = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        jTextField11 = new javax.swing.JTextField();
-        jTextField12 = new javax.swing.JTextField();
-        jTextField13 = new javax.swing.JTextField();
-        jButton11 = new javax.swing.JButton();
+        jf_id = new javax.swing.JTextField();
+        jf_nama = new javax.swing.JTextField();
+        jf_notelp = new javax.swing.JTextField();
+        jButton_tambah = new javax.swing.JButton();
         jButton14 = new javax.swing.JButton();
-        jTextField14 = new javax.swing.JTextField();
-        jButton12 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
+        jf_alamat = new javax.swing.JTextField();
+        jlabel_id = new javax.swing.JLabel();
+        jlabel_nama = new javax.swing.JLabel();
+        jlabel_alamat = new javax.swing.JLabel();
+        jlabel_notelp = new javax.swing.JLabel();
+        jButton_ubah = new javax.swing.JButton();
+        jButton_hapus = new javax.swing.JButton();
         jButton_kembali = new javax.swing.JButton();
+        jLabel21 = new javax.swing.JLabel();
 
         jFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -419,7 +440,7 @@ public class Customer extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable4.setModel(new javax.swing.table.DefaultTableModel(
+        jTable_datacustomer.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -434,7 +455,12 @@ public class Customer extends javax.swing.JFrame {
                 "ID Customer", "Nama", "Alamat", "No Telp"
             }
         ));
-        jScrollPane4.setViewportView(jTable4);
+        jTable_datacustomer.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable_datacustomerMouseClicked(evt);
+            }
+        });
+        jScrollPane4.setViewportView(jTable_datacustomer);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Customer", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP));
         jPanel3.setToolTipText("");
@@ -448,33 +474,90 @@ public class Customer extends javax.swing.JFrame {
 
         jLabel20.setText("No Telp");
 
-        jButton11.setText("Simpan");
+        jf_id.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jf_idKeyTyped(evt);
+            }
+        });
+
+        jf_nama.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jf_namaKeyTyped(evt);
+            }
+        });
+
+        jf_notelp.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jf_notelpKeyPressed(evt);
+            }
+        });
+
+        jButton_tambah.setText("Tambah");
+        jButton_tambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_tambahActionPerformed(evt);
+            }
+        });
 
         jButton14.setText("Reset");
+        jButton14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton14ActionPerformed(evt);
+            }
+        });
+
+        jf_alamat.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jf_alamatKeyTyped(evt);
+            }
+        });
+
+        jlabel_id.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jlabel_id.setForeground(new java.awt.Color(255, 0, 0));
+        jlabel_id.setText(" ");
+
+        jlabel_nama.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jlabel_nama.setForeground(new java.awt.Color(255, 0, 0));
+        jlabel_nama.setText(" ");
+
+        jlabel_alamat.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jlabel_alamat.setForeground(new java.awt.Color(255, 0, 0));
+        jlabel_alamat.setText(" ");
+
+        jlabel_notelp.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jlabel_notelp.setForeground(new java.awt.Color(255, 0, 0));
+        jlabel_notelp.setText(" ");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(107, 107, 107)
+                .addGap(55, 55, 55)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel17)
-                    .addComponent(jLabel18)
                     .addComponent(jLabel19)
-                    .addComponent(jLabel20))
-                .addGap(18, 18, 18)
+                    .addComponent(jLabel20)
+                    .addComponent(jLabel18)
+                    .addComponent(jLabel17))
+                .addGap(34, 34, 34)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField13)
-                    .addComponent(jTextField11)
-                    .addComponent(jTextField12)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton11)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton14)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jTextField14))
-                .addGap(187, 187, 187))
+                        .addComponent(jButton_tambah)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton14))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jf_notelp, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                            .addComponent(jf_alamat, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jf_id, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jf_nama, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jlabel_id, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlabel_nama, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlabel_alamat, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jlabel_notelp, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -482,29 +565,43 @@ public class Customer extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel17)
-                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jf_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jlabel_id))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
-                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jf_nama, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jlabel_nama))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19)
-                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jf_alamat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jlabel_alamat))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel20)
-                    .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jf_notelp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jlabel_notelp))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton11)
+                    .addComponent(jButton_tambah)
                     .addComponent(jButton14))
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        jButton12.setText("Ubah");
+        jButton_ubah.setText("Ubah");
+        jButton_ubah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_ubahActionPerformed(evt);
+            }
+        });
 
-        jButton13.setText("Hapus");
+        jButton_hapus.setText("Hapus");
+        jButton_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_hapusActionPerformed(evt);
+            }
+        });
 
         jButton_kembali.setText("Kembali");
         jButton_kembali.addActionListener(new java.awt.event.ActionListener() {
@@ -513,25 +610,27 @@ public class Customer extends javax.swing.JFrame {
             }
         });
 
+        jLabel21.setFont(new java.awt.Font("Lucida Grande", 0, 12)); // NOI18N
+        jLabel21.setText("*Ketuk pada data untuk mengubah atau menghapus data");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(46, 46, 46)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton_kembali)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton13)
-                        .addGap(64, 64, 64))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane4))
-                        .addContainerGap(64, Short.MAX_VALUE))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel21)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jButton_kembali)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton_ubah)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton_hapus))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -540,12 +639,14 @@ public class Customer extends javax.swing.JFrame {
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton12)
-                    .addComponent(jButton13)
+                    .addComponent(jButton_ubah)
+                    .addComponent(jButton_hapus)
                     .addComponent(jButton_kembali))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel21)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -557,6 +658,151 @@ public class Customer extends javax.swing.JFrame {
         menu m = new menu();
         m.setVisible(true);
     }//GEN-LAST:event_jButton_kembaliActionPerformed
+
+    private void jButton_ubahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_ubahActionPerformed
+        // TODO add your handling code here:
+        try {
+            if (jf_id.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Pilih data yang ingin diubah", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else if(jf_nama.getText().trim().isEmpty() || jf_alamat.getText().trim().isEmpty() || jf_notelp.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                if(jf_nama.getText().trim().length() >20 || jf_alamat.getText().trim().length() > 30 || jf_notelp.getText().trim().length() > 12){
+                    JOptionPane.showMessageDialog(null, "Data Tidak Sesuai", "eror", JOptionPane.WARNING_MESSAGE);
+                }
+                else{
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    cn.createStatement().executeUpdate("update tb_customer set nama = '"+jf_nama.getText()+"', alamat = '"+jf_alamat.getText()+"', no_telp = '"+jf_notelp.getText()+"' where id_customer = '"+ jf_id.getText()+"'");
+                    tampil_tb_customer();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Mengubah Data");   
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_ubahActionPerformed
+
+    private void jButton_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_tambahActionPerformed
+        // TODO add your handling code here:
+        try {
+            if (jf_id.getText().trim().isEmpty() || jf_nama.getText().trim().isEmpty() || jf_alamat.getText().trim().isEmpty() || jf_notelp.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                if(jf_id.getText().trim().length() >8 || jf_nama.getText().trim().length() >20 || jf_alamat.getText().trim().length() > 30 || jf_notelp.getText().trim().length() > 12){
+                    JOptionPane.showMessageDialog(null, "Data Tidak Sesuai", "eror", JOptionPane.WARNING_MESSAGE);
+                }
+                else
+                {
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    cn.createStatement().executeUpdate("insert into tb_customer values"+"('"+jf_id.getText()+"','"+jf_nama.getText()+"','"+jf_alamat.getText()+"','"+jf_notelp.getText()+"')");
+                    tampil_tb_customer();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Tambah Data");    
+                }  
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Primary Key sudah ada", "eror", JOptionPane.WARNING_MESSAGE);
+            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_tambahActionPerformed
+
+    private void jf_notelpKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_notelpKeyPressed
+        // TODO add your handling code here:
+        char c = evt.getKeyChar();
+        if(Character.isLetter(c)){
+            jf_notelp.setEditable(false);
+            jlabel_notelp.setText("Hanya Masukkan Angka!");
+        }
+        else if (jf_notelp.getText().trim().length() > 12){
+            jlabel_notelp.setText("Maksimal 12 Karakter");
+            jf_notelp.setEditable(true);
+        }
+        else{
+            jf_notelp.setEditable(true);
+            jlabel_notelp.setText("");
+        }
+    }//GEN-LAST:event_jf_notelpKeyPressed
+
+    private void jf_idKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_idKeyTyped
+        // TODO add your handling code here:
+        if (jf_id.getText().trim().length() <= 8){
+            jlabel_id.setText("");
+        }
+        else
+        {
+            jlabel_id.setText("Maksimal 8 Karakter");
+        }
+    }//GEN-LAST:event_jf_idKeyTyped
+
+    private void jf_namaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_namaKeyTyped
+        // TODO add your handling code here:
+        if (jf_nama.getText().trim().length() <= 20){
+            jlabel_nama.setText("");
+        }
+        else
+        {
+            jlabel_nama.setText("Maksimal 20 Karakter");
+        }
+    }//GEN-LAST:event_jf_namaKeyTyped
+
+    private void jf_alamatKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_alamatKeyTyped
+        // TODO add your handling code here:
+        if (jf_alamat.getText().trim().length() <= 30){
+            jlabel_alamat.setText("");
+        }
+        else
+        {
+            jlabel_alamat.setText("Maksimal 30 Karakter");
+        }
+    }//GEN-LAST:event_jf_alamatKeyTyped
+
+    private void jTable_datacustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable_datacustomerMouseClicked
+        // TODO add your handling code here:
+        int i = jTable_datacustomer.getSelectedRow();
+        if(i>-1){
+            jf_id.setText(model.getValueAt(i,0).toString());
+            jf_id.setEnabled(false);
+            jf_nama.setText(model.getValueAt(i,1).toString());
+            jf_alamat.setText(model.getValueAt(i,2).toString());
+            jf_notelp.setText(model.getValueAt(i,3).toString());
+            jButton_tambah.setEnabled(false);
+            jButton_ubah.setEnabled(true);
+            jButton_hapus.setEnabled(true);
+        }
+    }//GEN-LAST:event_jTable_datacustomerMouseClicked
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
+        // TODO add your handling code here:
+        reset();
+    }//GEN-LAST:event_jButton14ActionPerformed
+
+    private void jButton_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hapusActionPerformed
+        // TODO add your handling code here:
+        try {
+            // TODO add your handling code here:
+            
+            if (jf_id.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Pilih data yang ingin dihapus", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                int mauhapus = JOptionPane.showConfirmDialog(null, "Hapus Data Terpilih?","Warning",JOptionPane.YES_NO_OPTION);
+                if (mauhapus == JOptionPane.YES_OPTION)
+                {
+                Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                cn.createStatement().executeUpdate("delete from tb_customer where id_customer = '"+jf_id.getText()+"'");
+                tampil_tb_customer();
+                reset();
+                JOptionPane.showMessageDialog(this, "Berhasil Menghapus Data");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_hapusActionPerformed
 
     /**
      * @param args the command line arguments
@@ -596,9 +842,6 @@ public class Customer extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton14;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -608,7 +851,10 @@ public class Customer extends javax.swing.JFrame {
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JButton jButton_hapus;
     private javax.swing.JButton jButton_kembali;
+    private javax.swing.JButton jButton_tambah;
+    private javax.swing.JButton jButton_ubah;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JComboBox<String> jComboBox3;
@@ -630,6 +876,7 @@ public class Customer extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -645,13 +892,9 @@ public class Customer extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
-    private javax.swing.JTable jTable4;
+    private javax.swing.JTable jTable_datacustomer;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
-    private javax.swing.JTextField jTextField11;
-    private javax.swing.JTextField jTextField12;
-    private javax.swing.JTextField jTextField13;
-    private javax.swing.JTextField jTextField14;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
@@ -660,5 +903,42 @@ public class Customer extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
+    private javax.swing.JTextField jf_alamat;
+    private javax.swing.JTextField jf_id;
+    private javax.swing.JTextField jf_nama;
+    private javax.swing.JTextField jf_notelp;
+    private javax.swing.JLabel jlabel_alamat;
+    private javax.swing.JLabel jlabel_id;
+    private javax.swing.JLabel jlabel_nama;
+    private javax.swing.JLabel jlabel_notelp;
     // End of variables declaration//GEN-END:variables
+        
+    private void tampil_tb_customer(){
+        int row = jTable_datacustomer.getRowCount();
+        for (int a=0; a<row; a++){
+            model.removeRow(0);
+            }
+            try {
+                Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                ResultSet rs = cn.createStatement().executeQuery("select * from tb_customer");
+                while (rs.next()){
+                    String data[]={rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4)};
+                    model.addRow(data);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    
+    private void reset(){
+        jf_id.setText("");
+        jf_id.setEnabled(true);
+        jf_nama.setText("");
+        jf_alamat.setText("");
+        jf_notelp.setText("");
+        jlabel_notelp.setText("");
+        jButton_tambah.setEnabled(true);
+        jButton_ubah.setEnabled(false);
+        jButton_hapus.setEnabled(false);
+    }
 }
