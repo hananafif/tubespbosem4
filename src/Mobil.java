@@ -1,3 +1,14 @@
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,12 +20,21 @@
  * @author 18102238_Mohammad Adiyudha_IF06G
  */
 public class Mobil extends javax.swing.JFrame {
-
+    DefaultTableModel model;
+    private String jRButton;
     /**
      * Creates new form Mobil
      */
     public Mobil() {
         initComponents();
+        String []judul = {"ID Mobil","No Polisi","Jenis","Kapasitas","Tahun","Warna","Harga","Status"};
+        model = new DefaultTableModel(judul,0);
+        jTable_datamobil.setModel(model);
+        tampil_tb_mobil();
+        jButton_ubah.setEnabled(false);
+        jButton_hapus.setEnabled(false);
+        jRButton = "1";
+        jRButton_tersedia.setSelected(true);
     }
 
     /**
@@ -26,9 +46,6 @@ public class Mobil extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -38,36 +55,28 @@ public class Mobil extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField6 = new javax.swing.JTextField();
-        jComboBox4 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        jf_id = new javax.swing.JTextField();
+        jf_nopol = new javax.swing.JTextField();
+        jC_jenis = new javax.swing.JComboBox<>();
+        jf_harga = new javax.swing.JTextField();
+        jf_warna = new javax.swing.JTextField();
+        jC_tahun = new javax.swing.JComboBox<>();
+        jButton_tambah = new javax.swing.JButton();
+        jButton_reset = new javax.swing.JButton();
+        jC_kapasitas = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
+        jRButton_tersedia = new javax.swing.JRadioButton();
+        jRButton_tidaktersedia = new javax.swing.JRadioButton();
+        jLabel_id = new javax.swing.JLabel();
+        jLabel_noplat = new javax.swing.JLabel();
+        jLabel_warna = new javax.swing.JLabel();
+        jLabel_harga = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        jTable_datamobil = new javax.swing.JTable();
         jButton_kembali = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        jButton_hapus = new javax.swing.JButton();
+        jButton_ubah = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -81,7 +90,7 @@ public class Mobil extends javax.swing.JFrame {
 
         jLabel3.setText("Jenis");
 
-        jLabel4.setText("Merk");
+        jLabel4.setText("Kapasitas");
 
         jLabel5.setText("Tahun");
 
@@ -91,15 +100,81 @@ public class Mobil extends javax.swing.JFrame {
 
         jLabel8.setText("Status");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sedan", "SUV", "MPV" }));
+        jf_id.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jf_idKeyTyped(evt);
+            }
+        });
 
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Tersedia", "Kosong" }));
+        jf_nopol.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jf_nopolKeyTyped(evt);
+            }
+        });
 
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020" }));
+        jC_jenis.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sedan", "SUV", "MPV" }));
 
-        jButton1.setText("Simpan");
+        jf_harga.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jf_hargaKeyPressed(evt);
+            }
+        });
 
-        jButton4.setText("Reset");
+        jf_warna.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jf_warnaKeyTyped(evt);
+            }
+        });
+
+        jC_tahun.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020" }));
+
+        jButton_tambah.setText("Tambah");
+        jButton_tambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_tambahActionPerformed(evt);
+            }
+        });
+
+        jButton_reset.setText("Reset");
+        jButton_reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_resetActionPerformed(evt);
+            }
+        });
+
+        jC_kapasitas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2", "4", "6", "8", "10" }));
+
+        jLabel9.setText("/ hari");
+
+        jRButton_tersedia.setText("Tersedia");
+        jRButton_tersedia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRButton_tersediaActionPerformed(evt);
+            }
+        });
+
+        jRButton_tidaktersedia.setText("Tidak Tersedia");
+        jRButton_tidaktersedia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRButton_tidaktersediaActionPerformed(evt);
+            }
+        });
+
+        jLabel_id.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_id.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_id.setText(" ");
+
+        jLabel_noplat.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_noplat.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_noplat.setText(" ");
+
+        jLabel_warna.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_warna.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_warna.setText(" ");
+
+        jLabel_harga.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_harga.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_harga.setText(" ");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -115,29 +190,46 @@ public class Mobil extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1)
-                            .addComponent(jTextField2)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(52, 52, 52)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(jButton_tambah)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4)))
-                .addGap(18, 18, 18)
+                        .addComponent(jButton_reset))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jf_id)
+                            .addComponent(jf_nopol)
+                            .addComponent(jC_jenis, 0, 148, Short.MAX_VALUE)
+                            .addComponent(jC_kapasitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel_id, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel_noplat, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel7)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addGap(2, 2, 2)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jTextField6, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(93, Short.MAX_VALUE))
+                    .addComponent(jC_tahun, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jf_warna, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel_warna, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jf_harga, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel_harga, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jRButton_tidaktersedia)
+                        .addComponent(jRButton_tersedia)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -145,35 +237,42 @@ public class Mobil extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jf_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jC_tahun, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel_id))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jf_nopol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jf_warna, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel_noplat)
+                    .addComponent(jLabel_warna))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jC_jenis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jf_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel_harga))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jC_kapasitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(jRButton_tersedia))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jRButton_tidaktersedia)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
-                    .addComponent(jButton1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton_reset)
+                    .addComponent(jButton_tambah))
+                .addContainerGap())
         );
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        jTable_datamobil.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null},
@@ -188,7 +287,12 @@ public class Mobil extends javax.swing.JFrame {
                 "ID Mobil", "No Plat", "Jenis", "Merk", "Tahun", "Warna", "Harga", "Status"
             }
         ));
-        jScrollPane2.setViewportView(jTable2);
+        jTable_datamobil.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable_datamobilMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jTable_datamobil);
 
         jButton_kembali.setText("Kembali");
         jButton_kembali.addActionListener(new java.awt.event.ActionListener() {
@@ -197,28 +301,46 @@ public class Mobil extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("Hapus");
+        jButton_hapus.setText("Hapus");
+        jButton_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_hapusActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Ubah");
+        jButton_ubah.setText("Ubah");
+        jButton_ubah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_ubahActionPerformed(evt);
+            }
+        });
+
+        jLabel10.setText("*Ketuk pada data untuk mengubah atau menghapus data");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton_kembali)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3))
-                    .addComponent(jScrollPane2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(42, 42, 42))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel10)
+                        .addGap(21, 21, 21))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(48, 48, 48)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton_kembali)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton_ubah)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton_hapus))
+                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 806, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
+                .addGap(27, 27, 27))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -228,11 +350,13 @@ public class Mobil extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton_kembali)
-                    .addComponent(jButton3)
-                    .addComponent(jButton2))
+                    .addComponent(jButton_hapus)
+                    .addComponent(jButton_ubah))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel10)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -244,6 +368,201 @@ public class Mobil extends javax.swing.JFrame {
         menu m = new menu();
         m.setVisible(true);
     }//GEN-LAST:event_jButton_kembaliActionPerformed
+
+    private void jButton_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_tambahActionPerformed
+        // TODO add your handling code here:
+        try {
+            
+            if (jf_id.getText().trim().isEmpty() || jf_nopol.getText().trim().isEmpty() || jf_warna.getText().trim().isEmpty() || jf_harga.getText().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                if(jf_id.getText().trim().length() >8 || jf_nopol.getText().trim().length() >9 || jf_warna.getText().trim().length() > 10 || jf_harga.getText().trim().length() > 9){
+                    JOptionPane.showMessageDialog(null, "Data Tidak Sesuai", "eror", JOptionPane.WARNING_MESSAGE);
+                }
+                else
+                {
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    String sql = "insert into tb_mobil (id_mobil,no_plat,jenis,kapasitas,tahun,warna,harga,status) values (?,?,?,?,?,?,?,?)";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ps.setString(1, jf_id.getText());
+                    ps.setString(2, jf_nopol.getText());
+                    String jenis = jC_jenis.getSelectedItem().toString();
+                    ps.setString(3, jenis);
+                    String kapasitas = jC_kapasitas.getSelectedItem().toString();
+                    ps.setString(4, kapasitas);
+                    String tahun = jC_tahun.getSelectedItem().toString();
+                    ps.setString(5, tahun);
+                    ps.setString(6, jf_warna.getText());
+                    ps.setString(7, jf_harga.getText());
+                    ps.setString(8, jRButton);
+                    ps.execute();
+                    tampil_tb_mobil();
+                    reset();
+                    //reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Tambah Data");    
+                }  
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Mobil.class.getName()).log(Level.SEVERE, null, ex);
+        }          
+    }//GEN-LAST:event_jButton_tambahActionPerformed
+
+    private void jRButton_tidaktersediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRButton_tidaktersediaActionPerformed
+        // TODO add your handling code here:
+        jRButton = "0";
+        if (jRButton_tidaktersedia.isSelected()){
+            jRButton_tersedia.setSelected(false);
+        }
+    }//GEN-LAST:event_jRButton_tidaktersediaActionPerformed
+
+    private void jRButton_tersediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRButton_tersediaActionPerformed
+        // TODO add your handling code here:
+        jRButton = "1";
+        if (jRButton_tersedia.isSelected()){
+            jRButton_tidaktersedia.setSelected(false);
+        }
+    }//GEN-LAST:event_jRButton_tersediaActionPerformed
+
+    private void jf_idKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_idKeyTyped
+        // TODO add your handling code here:
+        if (jf_id.getText().trim().length() <= 8){
+            jLabel_id.setText("");
+        }
+        else
+        {
+            jLabel_id.setText("Maksimal 8 Karakter");
+        }
+    }//GEN-LAST:event_jf_idKeyTyped
+
+    private void jf_nopolKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_nopolKeyTyped
+        // TODO add your handling code here:
+        if (jf_nopol.getText().trim().length() <= 9){
+            jLabel_noplat.setText("");
+        }
+        else
+        {
+            jLabel_noplat.setText("Maksimal 9 Karakter");
+        }
+    }//GEN-LAST:event_jf_nopolKeyTyped
+
+    private void jf_warnaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_warnaKeyTyped
+        // TODO add your handling code here:
+        if (jf_warna.getText().trim().length() <= 10){
+            jLabel_warna.setText("");
+        }
+        else
+        {
+            jLabel_warna.setText("Maksimal 10 Karakter");
+        }
+    }//GEN-LAST:event_jf_warnaKeyTyped
+
+    private void jf_hargaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_hargaKeyPressed
+        // TODO add your handling code here:
+        char c = evt.getKeyChar();
+        if(Character.isLetter(c)){
+            jf_harga.setEditable(false);
+            jLabel_harga.setText("Hanya Masukkan Angka!");
+        }
+        else if (jf_harga.getText().trim().length() > 9){
+            jLabel_harga.setText("Maksimal 9 Karakter");
+            jf_harga.setEditable(true);
+        }
+        else{
+            jf_harga.setEditable(true);
+            jLabel_harga.setText("");
+        }
+    }//GEN-LAST:event_jf_hargaKeyPressed
+
+    private void jButton_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_resetActionPerformed
+        // TODO add your handling code here:
+        reset();
+    }//GEN-LAST:event_jButton_resetActionPerformed
+
+    private void jTable_datamobilMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable_datamobilMouseClicked
+        // TODO add your handling code here:
+        int i = jTable_datamobil.getSelectedRow();
+        if(i>-1){
+            jf_id.setText(model.getValueAt(i,0).toString());
+            jf_id.setEnabled(false);
+            jf_nopol.setText(model.getValueAt(i,1).toString());
+            jC_jenis.setSelectedItem(model.getValueAt(i,2));
+            jC_kapasitas.setSelectedItem(model.getValueAt(i,3));
+            jC_tahun.setSelectedItem(model.getValueAt(i,4));
+            jf_warna.setText(model.getValueAt(i,5).toString());
+            jf_harga.setText(model.getValueAt(i,6).toString());
+            if (model.getValueAt(i,7).toString() == "Tersedia"){
+                jRButton_tersedia.setSelected(true);
+                jRButton_tidaktersedia.setSelected(false);
+            }
+            else{
+                jRButton_tersedia.setSelected(false);
+                jRButton_tidaktersedia.setSelected(true);
+            }
+            jButton_tambah.setEnabled(false);
+            jButton_ubah.setEnabled(true);
+            jButton_hapus.setEnabled(true);
+        }
+    }//GEN-LAST:event_jTable_datamobilMouseClicked
+
+    private void jButton_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hapusActionPerformed
+        try {
+            // TODO add your handling code here:            
+            if (jf_id.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Pilih data yang ingin dihapus", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                int mauhapus = JOptionPane.showConfirmDialog(null, "Hapus Data Terpilih?","Warning",JOptionPane.YES_NO_OPTION);
+                if (mauhapus == JOptionPane.YES_OPTION){
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    cn.createStatement().executeUpdate("delete from tb_mobil where id_mobil = '"+jf_id.getText()+"'");
+                    tampil_tb_mobil();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Menghapus Data");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_hapusActionPerformed
+
+    private void jButton_ubahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_ubahActionPerformed
+        try {
+            if (jf_id.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Pilih data yang ingin diubah", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else if(jf_nopol.getText().trim().isEmpty() || jf_warna.getText().trim().isEmpty() || jf_harga.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                if(jf_nopol.getText().trim().length() >9 || jf_warna.getText().trim().length() > 10 || jf_harga.getText().trim().length() > 9){
+                    JOptionPane.showMessageDialog(null, "Data Tidak Sesuai", "eror", JOptionPane.WARNING_MESSAGE);
+                }
+                else{
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    String sql = "update tb_mobil set no_plat=?,jenis=?,kapasitas=?,tahun=?,warna=?,harga=?,status=? where id_mobil = ? ";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ps.setString(1, jf_nopol.getText());
+                    String jenis = jC_jenis.getSelectedItem().toString();
+                    ps.setString(2, jenis);
+                    String kapasitas = jC_kapasitas.getSelectedItem().toString();
+                    ps.setString(3, kapasitas);
+                    String tahun = jC_tahun.getSelectedItem().toString();
+                    ps.setString(4, tahun);
+                    ps.setString(5, jf_warna.getText());
+                    ps.setString(6, jf_harga.getText());
+                    ps.setString(7, jRButton);
+                    ps.setString(8, jf_id.getText());
+                    ps.execute();
+                    tampil_tb_mobil();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Mengubah Data");   
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_ubahActionPerformed
 
     /**
      * @param args the command line arguments
@@ -281,16 +600,16 @@ public class Mobil extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton_hapus;
     private javax.swing.JButton jButton_kembali;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JComboBox<String> jComboBox4;
+    private javax.swing.JButton jButton_reset;
+    private javax.swing.JButton jButton_tambah;
+    private javax.swing.JButton jButton_ubah;
+    private javax.swing.JComboBox<String> jC_jenis;
+    private javax.swing.JComboBox<String> jC_kapasitas;
+    private javax.swing.JComboBox<String> jC_tahun;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -298,15 +617,74 @@ public class Mobil extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabel_harga;
+    private javax.swing.JLabel jLabel_id;
+    private javax.swing.JLabel jLabel_noplat;
+    private javax.swing.JLabel jLabel_warna;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JRadioButton jRButton_tersedia;
+    private javax.swing.JRadioButton jRButton_tidaktersedia;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField6;
+    private javax.swing.JTable jTable_datamobil;
+    private javax.swing.JTextField jf_harga;
+    private javax.swing.JTextField jf_id;
+    private javax.swing.JTextField jf_nopol;
+    private javax.swing.JTextField jf_warna;
     // End of variables declaration//GEN-END:variables
+    
+    private void tampil_tb_mobil(){
+        int row = jTable_datamobil.getRowCount();
+        for (int a=0; a<row; a++){
+            model.removeRow(0);
+        }
+        try {
+            Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+            ResultSet rs = cn.createStatement().executeQuery("select * from tb_mobil");
+            String statusmobil;
+            while (rs.next()){
+                if (rs.getBoolean(8) == true)
+                {
+                    statusmobil = "Tersedia";
+                }
+                else
+                {
+                    statusmobil = "Tidak Tersedia";
+                }
+                String data[]={
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getString(3),
+                    rs.getString(4),
+                    rs.getString(5).substring(0,4),
+                    rs.getString(6),
+                    rs.getString(7),
+                    statusmobil};
+                model.addRow(data);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(Mobil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void reset(){
+        jf_id.setText("");
+        jf_id.setEnabled(true);
+        jf_nopol.setText("");
+        jf_warna.setText("");
+        jf_harga.setText("");
+        jLabel_id.setText("");
+        jLabel_noplat.setText("");
+        jLabel_warna.setText("");
+        jLabel_harga.setText("");
+        jC_jenis.setSelectedIndex(0);
+        jC_kapasitas.setSelectedIndex(0);
+        jC_tahun.setSelectedIndex(0);
+        jRButton_tersedia.setSelected(true);
+        jRButton_tidaktersedia.setSelected(false);
+        jRButton = "1";
+        jButton_tambah.setEnabled(true);
+        jButton_ubah.setEnabled(false);
+        jButton_hapus.setEnabled(false);
+    }
 }
