@@ -37,7 +37,6 @@ public class Sewa extends javax.swing.JFrame {
         jTextField_total.setEditable(false);
         jTextField_mobil.setEditable(true);
         jButton_ubah.setEnabled(false);
-        jButton_hapus.setEnabled(false);
         jButton_pengembalian.setEnabled(false);
         list_karyawan();
         list_customer();
@@ -92,7 +91,6 @@ public class Sewa extends javax.swing.JFrame {
         jLabel_keterangan = new javax.swing.JLabel();
         jLabel_keterangan1 = new javax.swing.JLabel();
         jButton_kembali = new javax.swing.JButton();
-        jButton_hapus = new javax.swing.JButton();
         jButton_ubah = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
         jButton_pengembalian = new javax.swing.JButton();
@@ -347,18 +345,21 @@ public class Sewa extends javax.swing.JFrame {
             }
         });
 
-        jButton_hapus.setText("Hapus");
-        jButton_hapus.addActionListener(new java.awt.event.ActionListener() {
+        jButton_ubah.setText("Ubah");
+        jButton_ubah.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton_hapusActionPerformed(evt);
+                jButton_ubahActionPerformed(evt);
             }
         });
-
-        jButton_ubah.setText("Ubah");
 
         jLabel14.setText("*Ketuk pada data untuk mengubah atau menghapus data");
 
         jButton_pengembalian.setText("Pengembalian");
+        jButton_pengembalian.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_pengembalianActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(153, 153, 153));
@@ -382,9 +383,7 @@ public class Sewa extends javax.swing.JFrame {
                             .addGap(18, 18, 18)
                             .addComponent(jLabel8)
                             .addGap(18, 18, 18)
-                            .addComponent(jButton_ubah)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton_hapus))))
+                            .addComponent(jButton_ubah))))
                 .addGap(48, 48, 48))
         );
         layout.setVerticalGroup(
@@ -394,7 +393,6 @@ public class Sewa extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton_hapus)
                     .addComponent(jButton_ubah)
                     .addComponent(jLabel8)
                     .addComponent(jButton_pengembalian)
@@ -563,7 +561,6 @@ public class Sewa extends javax.swing.JFrame {
             jTextField_total.setText(model.getValueAt(i, 8).toString());
             jButton_tambah.setEnabled(false);
             jButton_ubah.setEnabled(true);
-            jButton_hapus.setEnabled(true);
             jButton_pengembalian.setEnabled(true);
             jComboBox_mobil.setEnabled(false);
             jLabel_pilihmobil.setText("*Tidak dapat diubah");
@@ -583,27 +580,59 @@ public class Sewa extends javax.swing.JFrame {
         reset();
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void jButton_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hapusActionPerformed
+    private void jButton_ubahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_ubahActionPerformed
+        try {
+            if (jf_id.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Pilih data yang ingin diubah", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else if(jComboBox_karyawan.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jTextField_jmlhari.getText().trim().length() == 0){
+                JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    String sql = "update tb_sewa set karyawan=?,customer=?,tgl_pinjam=?,tgl_pulang=?,jml_hari=?,harga=?,tot_harga=? where id_sewa = ? ";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    String karyawan = jComboBox_karyawan.getSelectedItem().toString();
+                    ps.setString(1, karyawan);
+                    String customer = jComboBox_customer.getSelectedItem().toString();
+                    ps.setString(2, customer);
+                    ps.setDate(3, new java.sql.Date(jDateChooser_pinjam.getDate().getTime()));
+                    ps.setDate(4, new java.sql.Date(jDateChooser_pulang.getDate().getTime()));
+                    ps.setString(5, jTextField_jmlhari.getText());
+                    ps.setString(6, jTextField_harga.getText());
+                    ps.setString(7, jTextField_total.getText());
+                    ps.setString(8, jf_id.getText());
+                    ps.execute();
+                    tampil_tb_sewa();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Mengubah Data");   
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Sewa.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_ubahActionPerformed
+
+    private void jButton_pengembalianActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_pengembalianActionPerformed
         try {
             // TODO add your handling code here:            
             if (jf_id.getText().trim().isEmpty()){
                 JOptionPane.showMessageDialog(null, "Pilih data yang ingin dihapus", "eror", JOptionPane.WARNING_MESSAGE);
             }
             else{
-                int mauhapus = JOptionPane.showConfirmDialog(null, "Hapus Data Terpilih?","Warning",JOptionPane.YES_NO_OPTION);
-                if (mauhapus == JOptionPane.YES_OPTION){
+                int maubalik = JOptionPane.showConfirmDialog(null, "Lakukan Pengembalian pada Data Terpilih?","Warning",JOptionPane.YES_NO_OPTION);
+                if (maubalik == JOptionPane.YES_OPTION){
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
                     cn.createStatement().executeUpdate("update tb_mobil set status = '1' where id_mobil = '"+ jTextField_mobil.getText().toString().split(" ")[0]+"'");
                     cn.createStatement().executeUpdate("delete from tb_sewa where id_sewa = '"+jf_id.getText()+"'");
                     tampil_tb_sewa();
                     reset();
-                    JOptionPane.showMessageDialog(this, "Berhasil Menghapus Data");
+                    JOptionPane.showMessageDialog(this, "Berhasil Melakukan Pengembalian");
                 }
             }
         } catch (SQLException ex) {
             Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton_hapusActionPerformed
+    }//GEN-LAST:event_jButton_pengembalianActionPerformed
 
     /**
      * @param args the command line arguments
@@ -642,7 +671,6 @@ public class Sewa extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton_hapus;
     private javax.swing.JButton jButton_kembali;
     private javax.swing.JButton jButton_pengembalian;
     private javax.swing.JButton jButton_tambah;
