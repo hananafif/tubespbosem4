@@ -1,12 +1,18 @@
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -26,12 +32,20 @@ public class Sewa extends javax.swing.JFrame {
      */
     public Sewa() {
         initComponents();
+        jTextField_jmlhari.setEditable(false);
+        jTextField_harga.setEditable(false);
+        jTextField_total.setEditable(false);
+        jTextField_mobil.setEditable(true);
+        jButton_ubah.setEnabled(false);
+        jButton_hapus.setEnabled(false);
+        jButton_pengembalian.setEnabled(false);
         list_karyawan();
         list_customer();
         list_mobil();
         kalender();
+        jComboBox_mobil.setSelectedItem(0);
         jDateChooser_pulang.setEnabled(false);
-        String []judul = {"ID Sewa","Nama Karyawan","Nama Customer","Nomor Polisi","Tanggal Pinjam","Tanggal Pulang","Jumlah Hari","Harga","Total Harga"};
+        String []judul = {"ID Sewa","Karyawan","Customer","Mobil","Tanggal Pinjam","Tanggal Pulang","Jumlah Hari","Harga","Total Harga"};
         model = new DefaultTableModel(judul,0);
         jTable_sewa.setModel(model);
         tampil_tb_sewa();
@@ -56,9 +70,9 @@ public class Sewa extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jf_id = new javax.swing.JTextField();
+        jTextField_jmlhari = new javax.swing.JTextField();
+        jButton_tambah = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jDateChooser_pinjam = new com.toedter.calendar.JDateChooser();
         jDateChooser_pulang = new com.toedter.calendar.JDateChooser();
@@ -66,17 +80,22 @@ public class Sewa extends javax.swing.JFrame {
         jComboBox_customer = new javax.swing.JComboBox<>();
         jComboBox_karyawan = new javax.swing.JComboBox<>();
         jLabel11 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
+        jTextField_harga = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jTextField7 = new javax.swing.JTextField();
+        jTextField_total = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
+        jLabel_id = new javax.swing.JLabel();
+        jLabel_pilihmobil = new javax.swing.JLabel();
+        jTextField_mobil = new javax.swing.JTextField();
+        jLabel_mobil = new javax.swing.JLabel();
+        jLabel_keterangan = new javax.swing.JLabel();
+        jLabel_keterangan1 = new javax.swing.JLabel();
         jButton_kembali = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButton_hapus = new javax.swing.JButton();
+        jButton_ubah = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
+        jButton_pengembalian = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -96,6 +115,11 @@ public class Sewa extends javax.swing.JFrame {
                 "ID Sewa", "ID Karyawan", "ID Customer", "ID Mobil", "Tgl Pinjam", "Tgl Pulang", "Total Harga"
             }
         ));
+        jTable_sewa.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable_sewaMouseClicked(evt);
+            }
+        });
         jScrollPane4.setViewportView(jTable_sewa);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Sewa", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP));
@@ -104,11 +128,11 @@ public class Sewa extends javax.swing.JFrame {
 
         jLabel1.setText("ID Sewa");
 
-        jLabel2.setText("Nama Karyawan");
+        jLabel2.setText("Karyawan");
 
-        jLabel3.setText("Nama Customer");
+        jLabel3.setText("Customer");
 
-        jLabel4.setText("Nomor Polisi Mobil");
+        jLabel4.setText("Mobil");
 
         jLabel5.setText("Tanggal Pinjam");
 
@@ -116,15 +140,27 @@ public class Sewa extends javax.swing.JFrame {
 
         jLabel7.setText("Jumlah Hari");
 
-        jButton1.setText("Simpan");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jf_id.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jf_idKeyPressed(evt);
+            }
+        });
+
+        jButton_tambah.setText("Simpan");
+        jButton_tambah.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButton_tambahActionPerformed(evt);
             }
         });
 
         jButton4.setText("Reset");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
+        jDateChooser_pinjam.setDateFormatString("yyyy-MM-dd");
         jDateChooser_pinjam.setPreferredSize(new java.awt.Dimension(99, 27));
         jDateChooser_pinjam.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
@@ -132,9 +168,20 @@ public class Sewa extends javax.swing.JFrame {
             }
         });
 
+        jDateChooser_pulang.setDateFormatString("yyyy-MM-dd");
         jDateChooser_pulang.setPreferredSize(new java.awt.Dimension(99, 27));
+        jDateChooser_pulang.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jDateChooser_pulangPropertyChange(evt);
+            }
+        });
 
         jComboBox_mobil.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Pilih Mobil-" }));
+        jComboBox_mobil.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBox_mobilItemStateChanged(evt);
+            }
+        });
 
         jComboBox_customer.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "-Pilih Customer-" }));
 
@@ -145,19 +192,34 @@ public class Sewa extends javax.swing.JFrame {
         jLabel12.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         jLabel12.setText("Rincian Biaya");
 
-        jTextField7.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
-        jTextField7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField7ActionPerformed(evt);
-            }
-        });
+        jTextField_total.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
 
         jLabel16.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         jLabel16.setText("Total");
 
-        jLabel21.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        jLabel21.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel21.setText("Maksimal 8 Karakter");
+        jLabel_id.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_id.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_id.setText(" ");
+
+        jLabel_pilihmobil.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_pilihmobil.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_pilihmobil.setText(" ");
+
+        jTextField_mobil.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTextField_mobilKeyPressed(evt);
+            }
+        });
+
+        jLabel_mobil.setText("Mobil Disewa");
+
+        jLabel_keterangan.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_keterangan.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_keterangan.setText(" ");
+
+        jLabel_keterangan1.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
+        jLabel_keterangan1.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel_keterangan1.setText(" ");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -175,38 +237,46 @@ public class Sewa extends javax.swing.JFrame {
                 .addGap(24, 24, 24)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jDateChooser_pulang, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jDateChooser_pinjam, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox_customer, javax.swing.GroupLayout.Alignment.LEADING, 0, 1, Short.MAX_VALUE)
+                            .addComponent(jComboBox_mobil, javax.swing.GroupLayout.Alignment.LEADING, 0, 162, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton4))
+                        .addComponent(jLabel_pilihmobil, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jDateChooser_pulang, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jDateChooser_pinjam, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jComboBox_customer, javax.swing.GroupLayout.Alignment.LEADING, 0, 1, Short.MAX_VALUE)
-                                .addComponent(jComboBox_mobil, javax.swing.GroupLayout.Alignment.LEADING, 0, 162, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jComboBox_karyawan, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(24, 24, 24)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(24, 24, 24)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
-                                    .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel16)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(jComboBox_karyawan, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jf_id, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel_id, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButton_tambah)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton4)))
+                .addGap(24, 24, 24)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel12)
+                        .addComponent(jSeparator1)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGap(24, 24, 24)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jTextField_jmlhari, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+                                .addComponent(jTextField_harga, javax.swing.GroupLayout.Alignment.TRAILING)))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel16)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jTextField_total, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel_keterangan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel_keterangan1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel_mobil)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextField_mobil, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(51, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -215,27 +285,28 @@ public class Sewa extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jf_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12)
-                    .addComponent(jLabel21))
+                    .addComponent(jLabel_id))
                 .addGap(17, 17, 17)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboBox_karyawan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel7)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextField_jmlhari, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboBox_customer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addComponent(jLabel11)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jComboBox_mobil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel_pilihmobil))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jDateChooser_pinjam, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -243,18 +314,29 @@ public class Sewa extends javax.swing.JFrame {
                         .addGap(16, 16, 16)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jDateChooser_pulang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1)
-                            .addComponent(jButton4)))
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField_mobil, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel_mobil))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextField_total, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel16))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel_keterangan)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton_tambah)
+                            .addComponent(jButton4)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel_keterangan1)))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -265,13 +347,18 @@ public class Sewa extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("Hapus");
+        jButton_hapus.setText("Hapus");
+        jButton_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_hapusActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Ubah");
+        jButton_ubah.setText("Ubah");
 
         jLabel14.setText("*Ketuk pada data untuk mengubah atau menghapus data");
 
-        jButton5.setText("Pengembalian");
+        jButton_pengembalian.setText("Pengembalian");
 
         jLabel8.setFont(new java.awt.Font("Lucida Grande", 0, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(153, 153, 153));
@@ -291,13 +378,13 @@ public class Sewa extends javax.swing.JFrame {
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addComponent(jButton_kembali)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton5)
+                            .addComponent(jButton_pengembalian)
                             .addGap(18, 18, 18)
                             .addComponent(jLabel8)
                             .addGap(18, 18, 18)
-                            .addComponent(jButton2)
+                            .addComponent(jButton_ubah)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton3))))
+                            .addComponent(jButton_hapus))))
                 .addGap(48, 48, 48))
         );
         layout.setVerticalGroup(
@@ -307,25 +394,62 @@ public class Sewa extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton3)
-                    .addComponent(jButton2)
+                    .addComponent(jButton_hapus)
+                    .addComponent(jButton_ubah)
                     .addComponent(jLabel8)
-                    .addComponent(jButton5)
+                    .addComponent(jButton_pengembalian)
                     .addComponent(jButton_kembali))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel14)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void jButton_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_tambahActionPerformed
+        try {
+            
+            if (jf_id.getText().trim().isEmpty() || jComboBox_karyawan.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jTextField_jmlhari.getText().trim().length() == 0){
+                JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                if(jf_id.getText().trim().length() > 8){
+                    JOptionPane.showMessageDialog(null, "Data Tidak Sesuai", "eror", JOptionPane.WARNING_MESSAGE);
+                }
+                else
+                {
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    String sql = "insert into tb_sewa (id_sewa,karyawan,customer,mobil,tgl_pinjam,tgl_pulang,jml_hari,harga,tot_harga) values (?,?,?,?,?,?,?,?,?)";
+                    String sqlupdate = "update tb_mobil set status = '0' where id_mobil = '" + jComboBox_mobil.getSelectedItem().toString().split(" ")[0] +"'";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    PreparedStatement ps2 = cn.prepareStatement(sqlupdate);
+                    ps.setString(1, jf_id.getText());
+                    String karyawan = jComboBox_karyawan.getSelectedItem().toString();
+                    ps.setString(2, karyawan);
+                    String customer = jComboBox_customer.getSelectedItem().toString();
+                    ps.setString(3, customer);
+                    String mobil = jComboBox_mobil.getSelectedItem().toString();
+                    ps.setString(4, mobil);
+                    ps.setDate(5, new java.sql.Date(jDateChooser_pinjam.getDate().getTime()));
+                    ps.setDate(6, new java.sql.Date(jDateChooser_pulang.getDate().getTime()));
+                    ps.setString(7, jTextField_jmlhari.getText());
+                    ps.setString(8, jTextField_harga.getText());
+                    ps.setString(9, jTextField_total.getText());
+                    ps.execute();
+                    ps2.execute();
+                    tampil_tb_sewa();
+                    JOptionPane.showMessageDialog(this, "Berhasil Tambah Data");    
+                    reset();
+                }  
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Mobil.class.getName()).log(Level.SEVERE, null, ex);
+        }          
+    }//GEN-LAST:event_jButton_tambahActionPerformed
 
     private void jButton_kembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_kembaliActionPerformed
         // TODO add your handling code here:
@@ -334,14 +458,152 @@ public class Sewa extends javax.swing.JFrame {
         m.setVisible(true);
     }//GEN-LAST:event_jButton_kembaliActionPerformed
 
-    private void jTextField7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField7ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField7ActionPerformed
-
     private void jDateChooser_pinjamPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDateChooser_pinjamPropertyChange
         // TODO add your handling code here:
         jDateChooser_pulang.setEnabled(true);
+        jDateChooser_pulang.setMinSelectableDate(jDateChooser_pinjam.getDate());
+        try{
+            Date pinjam = jDateChooser_pinjam.getDate();
+            Date pulang = jDateChooser_pulang.getDate();
+            if (pinjam != null && pulang != null){
+                long beda = Math.abs(pulang.getTime() - pinjam.getTime());
+                long dif = TimeUnit.DAYS.convert(beda, TimeUnit.MILLISECONDS);
+                long set0 = 1;
+                if (dif == 0){
+                    dif = set0;
+                }else{
+                    dif = dif;
+                }
+                jTextField_jmlhari.setText(String.valueOf(dif));
+                hit_tot();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_jDateChooser_pinjamPropertyChange
+
+    private void jDateChooser_pulangPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jDateChooser_pulangPropertyChange
+        jDateChooser_pinjam.setMaxSelectableDate(jDateChooser_pulang.getDate());
+        try{
+            Date pinjam = jDateChooser_pinjam.getDate();
+            Date pulang = jDateChooser_pulang.getDate();
+            if (pinjam != null && pulang != null){
+                long beda = Math.abs(pulang.getTime() - pinjam.getTime());
+                long dif = TimeUnit.DAYS.convert(beda, TimeUnit.MILLISECONDS);
+                long set0 = 1;
+                if (dif == 0){
+                    dif = set0;
+                }else{
+                    dif = dif;
+                }
+                jTextField_jmlhari.setText(String.valueOf(dif));
+                hit_tot();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jDateChooser_pulangPropertyChange
+
+    private void jComboBox_mobilItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox_mobilItemStateChanged
+        if (jComboBox_mobil.getSelectedItem() != null ){
+            if (jComboBox_mobil.getSelectedIndex() == 0){
+                jLabel_pilihmobil.setText("Pilih Mobil");
+                jTextField_harga.setText("");
+                jTextField_total.setText("");
+            }else{
+                jTextField_mobil.setText(jComboBox_mobil.getSelectedItem().toString());
+                jLabel_pilihmobil.setText("");
+                try {
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    Statement stat = cn.createStatement();
+                    String selectQuery="select harga from tb_mobil where id_mobil= '" + jComboBox_mobil.getSelectedItem().toString().split(" ")[0] + "'";
+                    ResultSet rs=stat.executeQuery(selectQuery);
+                    if (rs.next()){
+                        jTextField_harga.setText(rs.getString("harga"));   
+                    }
+                    hit_tot();
+                } catch (SQLException ex) {
+                    Logger.getLogger(Sewa.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+        }   
+    }//GEN-LAST:event_jComboBox_mobilItemStateChanged
+
+    private void jf_idKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jf_idKeyPressed
+        if (jf_id.getText().trim().length() <= 8){
+            jLabel_id.setText("");
+        }
+        else
+        {
+            jLabel_id.setText("Maksimal 8 Karakter");
+        }
+    }//GEN-LAST:event_jf_idKeyPressed
+
+    private void jTable_sewaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable_sewaMouseClicked
+        int i = jTable_sewa.getSelectedRow();
+        if(i>-1){
+            jf_id.setText(model.getValueAt(i,0).toString());
+            jf_id.setEnabled(false);
+            jComboBox_karyawan.setSelectedItem(model.getValueAt(i,1));
+            jComboBox_customer.setSelectedItem(model.getValueAt(i,2));
+            Date datepinjam;
+            Date datepulang;
+            try {
+                datepinjam = new SimpleDateFormat("yyyy-MM-dd").parse((String)model.getValueAt(i,4));
+                datepulang = new SimpleDateFormat("yyyy-MM-dd").parse((String)model.getValueAt(i,5));
+                jDateChooser_pinjam.setDate(datepinjam);
+                jDateChooser_pulang.setDate(datepulang);
+            } catch (ParseException ex) {
+                Logger.getLogger(Sewa.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            jTextField_mobil.setText(model.getValueAt(i,3).toString());
+            jTextField_jmlhari.setText(model.getValueAt(i,6).toString());
+            jTextField_harga.setText(model.getValueAt(i,7).toString());
+            jTextField_total.setText(model.getValueAt(i, 8).toString());
+            jButton_tambah.setEnabled(false);
+            jButton_ubah.setEnabled(true);
+            jButton_hapus.setEnabled(true);
+            jButton_pengembalian.setEnabled(true);
+            jComboBox_mobil.setEnabled(false);
+            jLabel_pilihmobil.setText("*Tidak dapat diubah");
+            jLabel_keterangan.setText("*Perubahan mobil hanya bisa dilakukan dengan");
+            jLabel_keterangan1.setText("cara melakukan pengembalian mobil");
+            jLabel_mobil.setVisible(true);
+            jTextField_mobil.setVisible(true);
+            jTextField_mobil.setEditable(false);
+        }
+    }//GEN-LAST:event_jTable_sewaMouseClicked
+
+    private void jTextField_mobilKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_mobilKeyPressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField_mobilKeyPressed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        reset();
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hapusActionPerformed
+        try {
+            // TODO add your handling code here:            
+            if (jf_id.getText().trim().isEmpty()){
+                JOptionPane.showMessageDialog(null, "Pilih data yang ingin dihapus", "eror", JOptionPane.WARNING_MESSAGE);
+            }
+            else{
+                int mauhapus = JOptionPane.showConfirmDialog(null, "Hapus Data Terpilih?","Warning",JOptionPane.YES_NO_OPTION);
+                if (mauhapus == JOptionPane.YES_OPTION){
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    cn.createStatement().executeUpdate("update tb_mobil set status = '1' where id_mobil = '"+ jTextField_mobil.getText().toString().split(" ")[0]+"'");
+                    cn.createStatement().executeUpdate("delete from tb_sewa where id_sewa = '"+jf_id.getText()+"'");
+                    tampil_tb_sewa();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Menghapus Data");
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton_hapusActionPerformed
 
     /**
      * @param args the command line arguments
@@ -379,12 +641,12 @@ public class Sewa extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton_hapus;
     private javax.swing.JButton jButton_kembali;
+    private javax.swing.JButton jButton_pengembalian;
+    private javax.swing.JButton jButton_tambah;
+    private javax.swing.JButton jButton_ubah;
     private javax.swing.JComboBox<String> jComboBox_customer;
     private javax.swing.JComboBox<String> jComboBox_karyawan;
     private javax.swing.JComboBox<String> jComboBox_mobil;
@@ -396,21 +658,26 @@ public class Sewa extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel_id;
+    private javax.swing.JLabel jLabel_keterangan;
+    private javax.swing.JLabel jLabel_keterangan1;
+    private javax.swing.JLabel jLabel_mobil;
+    private javax.swing.JLabel jLabel_pilihmobil;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable_sewa;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField7;
+    private javax.swing.JTextField jTextField_harga;
+    private javax.swing.JTextField jTextField_jmlhari;
+    private javax.swing.JTextField jTextField_mobil;
+    private javax.swing.JTextField jTextField_total;
+    private javax.swing.JTextField jf_id;
     // End of variables declaration//GEN-END:variables
     
     private void tampil_tb_sewa(){
@@ -442,13 +709,13 @@ public class Sewa extends javax.swing.JFrame {
     
     public void list_karyawan(){
         try {
-            Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-            Statement stat = cn.createStatement();
-            String selectQuery="select id_karyawan,nama from tb_karyawan";
-            ResultSet rs=stat.executeQuery(selectQuery);
-            while (rs.next()){
-                jComboBox_karyawan.addItem(rs.getString("id_karyawan") + " | " + rs.getString("nama"));
-            }
+                Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                Statement stat = cn.createStatement();
+                String selectQuery="select id_karyawan,nama from tb_karyawan";
+                ResultSet rs=stat.executeQuery(selectQuery);
+                while (rs.next()){
+                    jComboBox_karyawan.addItem(rs.getString("id_karyawan") + " | " + rs.getString("nama"));
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(Mobil.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -472,11 +739,11 @@ public class Sewa extends javax.swing.JFrame {
         try {
             Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
             Statement stat = cn.createStatement();
-            String selectQuery="select id_mobil,no_plat from tb_mobil";
+            String selectQuery="select id_mobil,no_plat from tb_mobil where status = '1'";
             ResultSet rs=stat.executeQuery(selectQuery);
             while (rs.next()){
                 jComboBox_mobil.addItem(rs.getString("id_mobil") + " | " + rs.getString("no_plat"));
-            }
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(Mobil.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -485,6 +752,42 @@ public class Sewa extends javax.swing.JFrame {
     public void kalender(){
         Date date = new Date();
         jDateChooser_pinjam.getJCalendar().setMinSelectableDate(date);
-        jDateChooser_pulang.getJCalendar().setMinSelectableDate(jDateChooser_pinjam.getMinSelectableDate());
+    }
+    
+    private void hit_tot(){
+        if(jTextField_harga.getText().trim().length() != 0 && jTextField_jmlhari.getText().trim().length() != 0){
+            int jml_hari = Integer.parseInt(jTextField_jmlhari.getText());
+            int hargahari = Integer.parseInt(jTextField_harga.getText());
+            int harga_tot = jml_hari * hargahari;
+            jTextField_total.setText(String.valueOf(harga_tot));
+        }else{
+            jTextField_total.setText("");
+        }        
+    }
+    
+    private void reset(){
+        this.hide();
+        Sewa s = new Sewa();
+        s.setVisible(true);
+//        jf_id.setText("");
+//        jf_id.setEnabled(true);
+//        jComboBox_karyawan.setSelectedIndex(0);
+//        jComboBox_customer.setSelectedIndex(0);
+//        jComboBox_mobil.setSelectedIndex(0);
+//        jComboBox_mobil.setEnabled(true);
+//        jDateChooser_pinjam.setCalendar(null);
+//        jDateChooser_pulang.setCalendar(null);
+//        jDateChooser_pulang.setEnabled(false);
+//        jTextField_jmlhari.setText("");
+//        jTextField_harga.setText("");
+//        jTextField_total.setText("");
+//        jTextField_mobil.setText("");
+//        jLabel_pilihmobil.setText("");
+//        jLabel_keterangan.setText("");
+//        jLabel_keterangan1.setText("");
+//        jButton_tambah.setEnabled(true);
+//        jButton_ubah.setEnabled(false);
+//        jButton_hapus.setEnabled(false);
+//        jButton_pengembalian.setEnabled(false);
     }
 }
