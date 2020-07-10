@@ -1,6 +1,7 @@
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -597,7 +598,7 @@ public class Karyawan extends javax.swing.JFrame {
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        jButton_ubah.setText("Simpan Perubahan");
+        jButton_ubah.setText("Ubah");
         jButton_ubah.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton_ubahActionPerformed(evt);
@@ -658,6 +659,7 @@ public class Karyawan extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     
@@ -681,7 +683,13 @@ public class Karyawan extends javax.swing.JFrame {
                 else
                 {
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-                    cn.createStatement().executeUpdate("insert into tb_karyawan values"+"('"+jf_id.getText()+"','"+jf_nama.getText()+"','"+jf_alamat.getText()+"','"+jf_notelp.getText()+"')");
+                    String sql = "insert into tb_karyawan(id_karyawan,nama,alamat,no_hp) values (?,?,?,?)";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ps.setString(1, jf_id.getText());
+                    ps.setString(2, jf_nama.getText());
+                    ps.setString(3, jf_alamat.getText());
+                    ps.setString(4, jf_notelp.getText());
+                    ps.execute();
                     tampil_tb_karyawan();
                     reset();
                     JOptionPane.showMessageDialog(this, "Berhasil Tambah Data");    
@@ -706,7 +714,13 @@ public class Karyawan extends javax.swing.JFrame {
                 }
                 else{
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-                    cn.createStatement().executeUpdate("update tb_karyawan set nama = '"+jf_nama.getText()+"', alamat = '"+jf_alamat.getText()+"', no_hp = '"+jf_notelp.getText()+"' where id_karyawan = '"+ jf_id.getText()+"'");
+                    String sql = "update tb_karyawan set nama=?,alamat=?,no_hp=? where id_karyawan = ? ";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ps.setString(1, jf_nama.getText());
+                    ps.setString(2, jf_alamat.getText());
+                    ps.setString(3, jf_notelp.getText());
+                    ps.setString(4, jf_id.getText());
+                    ps.execute();
                     tampil_tb_karyawan();
                     reset();
                     JOptionPane.showMessageDialog(this, "Berhasil Mengubah Data");   
@@ -734,20 +748,18 @@ public class Karyawan extends javax.swing.JFrame {
 
     private void jButton_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_hapusActionPerformed
         try {
-            // TODO add your handling code here:
-            
+            // TODO add your handling code here:            
             if (jf_id.getText().trim().isEmpty()){
                 JOptionPane.showMessageDialog(null, "Pilih data yang ingin dihapus", "eror", JOptionPane.WARNING_MESSAGE);
             }
             else{
                 int mauhapus = JOptionPane.showConfirmDialog(null, "Hapus Data Terpilih?","Warning",JOptionPane.YES_NO_OPTION);
-                if (mauhapus == JOptionPane.YES_OPTION)
-                {
-                Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-                cn.createStatement().executeUpdate("delete from tb_karyawan where id_karyawan = '"+jf_id.getText()+"'");
-                tampil_tb_karyawan();
-                reset();
-                JOptionPane.showMessageDialog(this, "Berhasil Menghapus Data");
+                if (mauhapus == JOptionPane.YES_OPTION){
+                    Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
+                    cn.createStatement().executeUpdate("delete from tb_karyawan where id_karyawan = '"+jf_id.getText()+"'");
+                    tampil_tb_karyawan();
+                    reset();
+                    JOptionPane.showMessageDialog(this, "Berhasil Menghapus Data");
                 }
             }
         } catch (SQLException ex) {
@@ -935,8 +947,8 @@ public class Karyawan extends javax.swing.JFrame {
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(Karyawan.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-}
 
     private void reset(){
         jf_id.setText("");
@@ -944,6 +956,9 @@ public class Karyawan extends javax.swing.JFrame {
         jf_nama.setText("");
         jf_alamat.setText("");
         jf_notelp.setText("");
+        jlabel_id.setText("");
+        jlabel_nama.setText("");
+        jlabel_alamat.setText("");
         jlabel_hanyaangka.setText("");
         jButton_tambah.setEnabled(true);
         jButton_ubah.setEnabled(false);

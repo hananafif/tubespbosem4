@@ -1,6 +1,7 @@
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -650,6 +651,7 @@ public class Customer extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton_kembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_kembaliActionPerformed
@@ -674,7 +676,13 @@ public class Customer extends javax.swing.JFrame {
                 }
                 else{
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-                    cn.createStatement().executeUpdate("update tb_customer set nama = '"+jf_nama.getText()+"', alamat = '"+jf_alamat.getText()+"', no_telp = '"+jf_notelp.getText()+"' where id_customer = '"+ jf_id.getText()+"'");
+                    String sql = "update tb_customer set nama=?,alamat=?,no_hp=? where id_customer = ? ";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ps.setString(1, jf_nama.getText());
+                    ps.setString(2, jf_alamat.getText());
+                    ps.setString(3, jf_notelp.getText());
+                    ps.setString(4, jf_id.getText());
+                    ps.execute();
                     tampil_tb_customer();
                     reset();
                     JOptionPane.showMessageDialog(this, "Berhasil Mengubah Data");   
@@ -698,7 +706,13 @@ public class Customer extends javax.swing.JFrame {
                 else
                 {
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-                    cn.createStatement().executeUpdate("insert into tb_customer values"+"('"+jf_id.getText()+"','"+jf_nama.getText()+"','"+jf_alamat.getText()+"','"+jf_notelp.getText()+"')");
+                    String sql = "insert into tb_customer(id_customer,nama,alamat,no_telp) values (?,?,?,?)";
+                    PreparedStatement ps = cn.prepareStatement(sql);
+                    ps.setString(1, jf_id.getText());
+                    ps.setString(2, jf_nama.getText());
+                    ps.setString(3, jf_alamat.getText());
+                    ps.setString(4, jf_notelp.getText());
+                    ps.execute();
                     tampil_tb_customer();
                     reset();
                     JOptionPane.showMessageDialog(this, "Berhasil Tambah Data");    
@@ -706,7 +720,6 @@ public class Customer extends javax.swing.JFrame {
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Primary Key sudah ada", "eror", JOptionPane.WARNING_MESSAGE);
-            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton_tambahActionPerformed
 
@@ -936,6 +949,9 @@ public class Customer extends javax.swing.JFrame {
         jf_nama.setText("");
         jf_alamat.setText("");
         jf_notelp.setText("");
+        jlabel_id.setText("");
+        jlabel_nama.setText("");
+        jlabel_alamat.setText("");
         jlabel_notelp.setText("");
         jButton_tambah.setEnabled(true);
         jButton_ubah.setEnabled(false);

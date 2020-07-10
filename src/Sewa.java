@@ -411,7 +411,7 @@ public class Sewa extends javax.swing.JFrame {
     private void jButton_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_tambahActionPerformed
         try {
             
-            if (jf_id.getText().trim().isEmpty() || jComboBox_karyawan.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jTextField_jmlhari.getText().trim().length() == 0){
+            if (jf_id.getText().trim().isEmpty() || jComboBox_karyawan.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jComboBox_customer.getSelectedIndex() == 0 || jTextField_jmlhari.getText().trim().length() == 0 || jTextField_harga.getText().trim().length() == 0){
                 JOptionPane.showMessageDialog(null, "Ada data yang kosong", "eror", JOptionPane.WARNING_MESSAGE);
             }
             else{
@@ -445,7 +445,7 @@ public class Sewa extends javax.swing.JFrame {
                 }  
             }
         } catch (SQLException ex) {
-            Logger.getLogger(Mobil.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Primary Key sudah ada", "eror", JOptionPane.WARNING_MESSAGE);
         }          
     }//GEN-LAST:event_jButton_tambahActionPerformed
 
@@ -508,6 +508,7 @@ public class Sewa extends javax.swing.JFrame {
                 jLabel_pilihmobil.setText("Pilih Mobil");
                 jTextField_harga.setText("");
                 jTextField_total.setText("");
+                jTextField_mobil.setText("");
             }else{
                 jTextField_mobil.setText(jComboBox_mobil.getSelectedItem().toString());
                 jLabel_pilihmobil.setText("");
