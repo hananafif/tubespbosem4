@@ -676,7 +676,7 @@ public class Customer extends javax.swing.JFrame {
                 }
                 else{
                     Connection cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sewa_mobilpbo","root","");
-                    String sql = "update tb_customer set nama=?,alamat=?,no_hp=? where id_customer = ? ";
+                    String sql = "update tb_customer set nama=?,alamat=?,no_telp=? where id_customer = ? ";
                     PreparedStatement ps = cn.prepareStatement(sql);
                     ps.setString(1, jf_nama.getText());
                     ps.setString(2, jf_alamat.getText());

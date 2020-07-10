@@ -404,7 +404,6 @@ public class Mobil extends javax.swing.JFrame {
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Primary Key sudah ada", "eror", JOptionPane.WARNING_MESSAGE);
-            Logger.getLogger(Customer.class.getName()).log(Level.SEVERE, null, ex);
         }          
     }//GEN-LAST:event_jButton_tambahActionPerformed
 
