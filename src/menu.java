@@ -33,6 +33,8 @@ public class menu extends javax.swing.JFrame {
         jButton_Sewa = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jButton_Exit = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -77,6 +79,10 @@ public class menu extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setText("18102231 - Hanan Afif Ramadhan");
+
+        jLabel4.setText("18102238 - Mohammad Adiyudha Wisnu Wardana");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -96,8 +102,14 @@ public class menu extends javax.swing.JFrame {
                         .addComponent(jLabel2))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(174, 174, 174)
-                        .addComponent(jLabel1)))
-                .addContainerGap(178, Short.MAX_VALUE))
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel4)))
+                .addContainerGap(170, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                     .addContainerGap(377, Short.MAX_VALUE)
@@ -119,7 +131,11 @@ public class menu extends javax.swing.JFrame {
                 .addComponent(jButton_DCustomer)
                 .addGap(18, 18, 18)
                 .addComponent(jButton_Sewa)
-                .addContainerGap(97, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addContainerGap())
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                     .addContainerGap(347, Short.MAX_VALUE)
@@ -128,6 +144,7 @@ public class menu extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton_DCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_DCustomerActionPerformed
@@ -206,5 +223,7 @@ public class menu extends javax.swing.JFrame {
     private javax.swing.JButton jButton_Sewa;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     // End of variables declaration//GEN-END:variables
 }
